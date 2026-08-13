@@ -1,7 +1,7 @@
 namespace Domain.Common;
 
-// Every table carries the same six audit columns, matching the SLCM database
-// convention. Program holds the screen code that touched the row, which is what
+// Every table carries the same six audit columns, following the enterprise
+// database convention. Program holds the screen code that touched the row, which is what
 // makes an audit trail readable when several screens write the same table.
 public abstract class AuditableEntity
 {

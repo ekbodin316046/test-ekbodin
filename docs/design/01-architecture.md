@@ -93,8 +93,8 @@ Application/Features/IT/IT03/
   Dtos/
 ```
 
-รูปแบบนี้ยกมาจากโครงสร้าง `Application/Features/DC/DCDT01/` ของ SLCM ที่แยก
-`Approve.cs`, `Cancel.cs`, `Create.cs` เป็นไฟล์ละงาน อ่านง่ายและหาของเจอเร็วเมื่อ feature โตขึ้น
+ใช้รูปแบบ feature folder ที่แยกไฟล์ละ use case (`Approve.cs`, `Reject.cs`, ...)
+อ่านง่ายและหาของเจอเร็วเมื่อ feature โตขึ้น
 
 `Approve` กับ `Reject` ต่างกันแค่สถานะเป้าหมาย งานที่เหมือนกันจึงอยู่ใน
 `DocumentDecisionExecutor` ตัวเดียว ไม่ก๊อปโค้ดสองรอบ แต่ยังคงมี entry point แยกชื่อชัดเจน

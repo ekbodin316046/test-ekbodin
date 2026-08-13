@@ -1,4 +1,4 @@
-/* Taken from the SLCM theme — see docs/design/04-ui-ux.md */
+/* Design tokens for the whole app — see docs/design/04-ui-ux.md */
 :root {
   --color-primary: #492c79;
   --color-sidebar: #352b55;
