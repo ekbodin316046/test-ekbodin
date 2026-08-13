@@ -1,0 +1,59 @@
+.total {
+  margin: 0 0 14px;
+  font-size: 13px;
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+}
+
+.tile {
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.count {
+  margin: 12px 0 10px;
+  font-size: 30px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.bar {
+  height: 6px;
+  background: #ececf1;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.fill-pending {
+  background: var(--color-yellow);
+}
+
+.fill-approved {
+  background: var(--color-green);
+}
+
+.fill-rejected {
+  background: var(--color-red);
+}
+
+.percent {
+  margin: 8px 0 0;
+  font-size: 12px;
+}
+
+.state {
+  margin: 0;
+  padding: 22px;
+  text-align: center;
+}

@@ -1,0 +1,27 @@
+.table-scroll {
+  overflow-x: auto;
+}
+
+.cell-id {
+  width: 80px;
+}
+
+.cell-count {
+  width: 140px;
+}
+
+.mono {
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 13px;
+}
+
+.state {
+  margin: 0;
+  padding: 22px;
+  text-align: center;
+}
+
+.hint {
+  margin: 12px 0 0;
+  font-size: 12px;
+}

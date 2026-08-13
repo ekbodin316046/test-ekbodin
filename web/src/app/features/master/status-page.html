@@ -1,0 +1,49 @@
+<nav class="breadcrumb" aria-label="ตำแหน่งหน้า">
+  <span>ตั้งค่าระบบ</span>
+  <span aria-hidden="true">/</span>
+  <span class="current">ข้อมูลสถานะเอกสาร</span>
+</nav>
+
+<section class="card">
+  <header class="card-head">
+    <span class="screen-code">MASTER</span>
+    <span class="card-title">ตารางสถานะเอกสาร (DocumentStatus)</span>
+  </header>
+
+  <div class="card-body">
+    @if (errorMessage()) {
+      <p class="alert alert-error" role="alert">{{ errorMessage() }}</p>
+    } @else if (isLoading()) {
+      <p class="state muted">กำลังโหลดข้อมูล...</p>
+    } @else {
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th class="cell-id">รหัส</th>
+              <th>Code</th>
+              <th>ชื่อสถานะ (ไทย)</th>
+              <th class="cell-count">จำนวนเอกสาร</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (status of statuses(); track status.id) {
+              <tr>
+                <td>{{ status.id }}</td>
+                <td class="mono">{{ status.code }}</td>
+                <td>
+                  <span class="status" [class]="statusClass(status.code)">{{ status.nameTh }}</span>
+                </td>
+                <td>{{ status.documentCount }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <p class="hint muted">
+        ข้อมูลหลักชุดนี้ฝังมากับ migration รหัสต้องตรงกับ enum DocumentStatusCode ในโค้ด
+      </p>
+    }
+  </div>
+</section>

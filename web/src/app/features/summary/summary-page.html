@@ -1,0 +1,35 @@
+<nav class="breadcrumb" aria-label="ตำแหน่งหน้า">
+  <span>งานเอกสาร</span>
+  <span aria-hidden="true">/</span>
+  <span class="current">สรุปสถานะเอกสาร</span>
+</nav>
+
+<section class="card">
+  <header class="card-head">
+    <span class="screen-code">IT 03-S</span>
+    <span class="card-title">สรุปสถานะเอกสารทั้งหมด</span>
+  </header>
+
+  <div class="card-body">
+    @if (errorMessage()) {
+      <p class="alert alert-error" role="alert">{{ errorMessage() }}</p>
+    } @else if (isLoading()) {
+      <p class="state muted">กำลังโหลดข้อมูล...</p>
+    } @else {
+      <p class="total muted">เอกสารทั้งหมด {{ total() }} รายการ</p>
+
+      <div class="tiles">
+        @for (tile of tiles(); track tile.code) {
+          <article class="tile">
+            <span class="status" [class]="statusClass(tile.code)">{{ tile.nameTh }}</span>
+            <p class="count">{{ tile.count }}</p>
+            <div class="bar" role="presentation">
+              <div class="bar-fill" [class]="'fill-' + tile.code.toLowerCase()" [style.width.%]="tile.percent"></div>
+            </div>
+            <p class="percent muted">{{ tile.percent }}% ของทั้งหมด</p>
+          </article>
+        }
+      </div>
+    }
+  </div>
+</section>
