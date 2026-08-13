@@ -84,9 +84,13 @@ dotnet test
 
 | ตาราง | หน้าที่ |
 |---|---|
-| `Documents` | เอกสาร: ชื่อ, เหตุผลปัจจุบัน, สถานะ, วันที่สร้าง/แก้ไข |
-| `DocumentStatus` | ตารางหลัก 3 สถานะ: `1 PENDING`, `2 APPROVED`, `3 REJECTED` |
-| `ApprovalLog` | ประวัติการเปลี่ยนสถานะทุกครั้ง: จากสถานะไหน เป็นสถานะไหน เหตุผล ใคร เมื่อไร |
+| `documents` | เอกสาร: ชื่อ, เหตุผลปัจจุบัน, สถานะ |
+| `document_status` | ตารางหลัก 3 สถานะ: `1 PENDING`, `2 APPROVED`, `3 REJECTED` |
+| `approval_log` | ประวัติการเปลี่ยนสถานะทุกครั้ง: จากสถานะไหน เป็นสถานะไหน เหตุผล ใคร เมื่อไร |
+
+ทุกตารางมีคอลัมน์ audit ชุดเดียวกัน `created_by` / `created_date` / `created_program` และ
+`updated_by` / `updated_date` / `updated_program` ตามมาตรฐานฐานข้อมูลของระบบ
+รายละเอียดอยู่ที่ [`docs/design/02-database.md`](docs/design/02-database.md)
 
 ข้อมูล mockup มี 10 รายการตรงตามภาพในข้อสอบ (รายการที่ 2, 5 อนุมัติแล้ว / 3, 6 ไม่อนุมัติ / ที่เหลือรออนุมัติ)
 

@@ -50,7 +50,7 @@ sequenceDiagram
   T->>T: BeginTransaction
   T->>H: Handle
   loop ทุก id ที่เลือก
-    H->>D: ChangeStatus(Approved, reason, actionBy)
+    H->>D: ChangeStatus(Approved, reason, actionBy, program)
     D-->>H: ApprovalLog หรือ โยน BusinessRuleException
   end
   H-->>T: DecisionResultDto
@@ -104,7 +104,8 @@ Application/Features/IT/IT03/
 หัวใจของข้อสอบคือ "อนุมัติแล้วห้ามอนุมัติซ้ำ" กฎนี้อยู่บน entity
 
 ```csharp
-public ApprovalLog ChangeStatus(DocumentStatusCode toStatus, string reason, string actionBy, DateTime now)
+public ApprovalLog ChangeStatus(
+    DocumentStatusCode toStatus, string reason, string actionBy, string program, DateTime now)
 {
     if (!IsPending)
         throw new BusinessRuleException($"เอกสาร '{DocumentName}' มีสถานะ '...' อยู่แล้ว ...");

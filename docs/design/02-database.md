@@ -24,53 +24,77 @@ SQLite ชนะเพราะทำให้ระยะห่างระห�
 
 ## โครงสร้าง
 
+ชื่อตารางและคอลัมน์เป็น `snake_case` ตามมาตรฐานฐานข้อมูลของ SLCM ส่วน property ในโค้ด C#
+ยังเป็น PascalCase ตามภาษา เชื่อมกันด้วย `HasColumnName` ใน configuration
+
 ```mermaid
 erDiagram
-  DocumentStatus ||--o{ Documents : "สถานะปัจจุบัน"
-  Documents ||--o{ ApprovalLog : "ประวัติ"
-  DocumentStatus ||--o{ ApprovalLog : "จาก / เป็น"
+  document_status ||--o{ documents : "สถานะปัจจุบัน"
+  documents ||--o{ approval_log : "ประวัติ"
+  document_status ||--o{ approval_log : "จาก / เป็น"
 
-  DocumentStatus {
-    int Id PK
-    nvarchar Code
-    nvarchar NameTh
+  document_status {
+    int status_id PK
+    varchar status_code
+    varchar status_name_tha
   }
-  Documents {
-    int Id PK
-    nvarchar DocumentName
-    nvarchar Reason
-    int StatusId FK
-    datetime CreatedAt
-    datetime UpdatedAt
+  documents {
+    int document_id PK
+    varchar document_name
+    varchar reason
+    int status_id FK
   }
-  ApprovalLog {
-    int Id PK
-    int DocumentId FK
-    int FromStatusId FK
-    int ToStatusId FK
-    nvarchar Reason
-    nvarchar ActionBy
-    datetime ActionAt
+  approval_log {
+    int approval_log_id PK
+    int document_id FK
+    int from_status_id FK
+    int to_status_id FK
+    varchar reason
   }
 ```
 
-### DocumentStatus (ตารางหลัก)
+ทุกตารางมีคอลัมน์ audit ชุดเดียวกันอีก 6 ตัว แยกไว้ในหัวข้อถัดไปเพื่อไม่ให้ ER diagram รก
 
-| Id | Code | NameTh |
+### คอลัมน์ audit (ทุกตาราง)
+
+| คอลัมน์ | ชนิด | ความหมาย |
+|---|---|---|
+| `created_by` | varchar(50) NOT NULL | รหัสผู้ใช้งานที่สร้างข้อมูล |
+| `created_date` | timestamp NOT NULL | วันเวลาที่สร้างข้อมูล |
+| `created_program` | varchar(50) NOT NULL | รหัสโปรแกรมที่สร้างข้อมูล |
+| `updated_by` | varchar(50) NOT NULL | รหัสผู้ใช้งานที่ปรับปรุงข้อมูลล่าสุด |
+| `updated_date` | timestamp NOT NULL | วันเวลาที่ปรับปรุงข้อมูลล่าสุด |
+| `updated_program` | varchar(50) NOT NULL | รหัสโปรแกรมที่ปรับปรุงข้อมูลล่าสุด |
+
+รวมไว้ที่ base class `Domain.Common.AuditableEntity` และผูกชื่อคอลัมน์ครั้งเดียวที่
+`AuditColumnConfiguration.HasAuditColumns()` ทั้งสามตารางจึงได้ชุดเดียวกันโดยไม่เขียนซ้ำ
+
+การเติมค่าเกิดที่ `AppDbContext.SaveChangesAsync` แถวที่เพิ่มใหม่และยังไม่มี `created_by`
+จะถูกประทับให้อัตโนมัติ ส่วนแถวที่แก้ไขจะได้ `updated_*` ชุดใหม่เสมอ
+แถวที่ตั้งค่ามาเองไว้แล้วจะไม่ถูกทับ เพราะ seeder ตั้งใจย้อนวันที่ให้ประวัติดูสมจริง
+
+`created_program` / `updated_program` เก็บ **รหัสหน้าจอ** เช่น `IT03` มาจาก
+`ICurrentUserAccessor.ProgramCode` ซึ่งอ่าน header `X-Program` ถ้าไม่ส่งมาใช้ `IT03`
+ข้อมูลที่มากับ seeder ใช้ `SYSTEM` / `SEED` เพื่อแยกให้ออกว่าไม่ได้เกิดจากคนกดหน้าจอ
+
+### document_status (ตารางหลัก)
+
+| status_id | status_code | status_name_tha |
 |---|---|---|
 | 1 | PENDING | รออนุมัติ |
 | 2 | APPROVED | อนุมัติ |
 | 3 | REJECTED | ไม่อนุมัติ |
 
-เก็บเป็นตารางแยกไม่ใช่ string ในตาราง Documents เพราะเป็นข้อมูลหลักที่มีรหัสตายตัว
+เก็บเป็นตารางแยกไม่ใช่ string ในตาราง `documents` เพราะเป็นข้อมูลหลักที่มีรหัสตายตัว
 และทำให้เพิ่มสถานะใหม่ไม่ต้องแก้โครงสร้าง
 
-`Id` ต้องตรงกับ enum `DocumentStatusCode` ในโค้ด จึงตั้ง `ValueGeneratedNever()`
-และฝังไปกับ migration ผ่าน `HasData` ไม่ใช่ seeder ตอน runtime
+`status_id` ต้องตรงกับ enum `DocumentStatusCode` ในโค้ด จึงตั้ง `ValueGeneratedNever()`
+และฝังไปกับ migration ผ่าน `HasData` ไม่ใช่ seeder ตอน runtime — ค่า audit ของสามแถวนี้
+จึงต้องเป็นค่าคงที่ ไม่ใช่ `DateTime.UtcNow` ไม่งั้น migration จะเปลี่ยนทุกครั้งที่ scaffold
 
-### Documents
+### documents
 
-`Reason` เป็นค่าที่ **denormalise ไว้ตั้งใจ** เก็บเหตุผลปัจจุบันของเอกสาร
+`reason` เป็นค่าที่ **denormalise ไว้ตั้งใจ** เก็บเหตุผลปัจจุบันของเอกสาร
 
 เหตุผล: ภาพ IT 03-1 แสดงเหตุผลในทุกแถวรวมแถวที่ยังรออนุมัติ ซึ่งยังไม่มีประวัติการอนุมัติ
 ถ้าดึงจาก `ApprovalLog` ล่าสุดเสมอ แถวรออนุมัติจะว่าง ไม่ตรงภาพ
@@ -79,26 +103,28 @@ erDiagram
 เดียวกัน (`Document.ChangeStatus`) จึงไม่มีทางไม่ตรงกัน และได้ผลพลอยได้คือ
 query หน้าตารางเป็นการอ่านตารางเดียว ไม่ต้อง join หา log ล่าสุด
 
-### ApprovalLog
+### approval_log
 
-เป็น append-only ไม่มีการ update หรือ delete เก็บ `FromStatusId` และ `ToStatusId`
+เป็น append-only ไม่มีการ update หรือ delete เก็บ `from_status_id` และ `to_status_id`
 ทั้งคู่ ไม่ใช่แค่สถานะปลายทาง เพื่อให้ตอบได้ว่าเอกสารเดินทางมาอย่างไร
 
-`ActionBy` มาจาก `ICurrentUserAccessor` ซึ่งอ่าน header `X-User` ถ้าไม่ส่งมาใช้ `demo.user`
+ตารางนี้ไม่มีคอลัมน์ "ผู้ดำเนินการ" แยกต่างหาก เพราะแถวถูกเขียนครั้งเดียวแล้วไม่แก้อีก
+`created_by` กับ `created_date` จึง**คือ**คนที่กดอนุมัติและเวลาที่กด ไม่ใช่ข้อมูลซ้ำซ้อน
+ค่ามาจาก `ICurrentUserAccessor` ซึ่งอ่าน header `X-User` ถ้าไม่ส่งมาใช้ `demo.user`
 
 FK สามตัวจึงมี `DeleteBehavior`
 
 | ความสัมพันธ์ | พฤติกรรม | เหตุผล |
 |---|---|---|
-| `ApprovalLog` → `Documents` | Cascade | ลบเอกสารแล้วประวัติไม่ควรลอย |
-| `ApprovalLog` → `DocumentStatus` | Restrict | ห้ามลบสถานะที่มีประวัติอ้างอยู่ |
-| `Documents` → `DocumentStatus` | Restrict | ห้ามลบสถานะที่มีเอกสารใช้อยู่ |
+| `approval_log` → `documents` | Cascade | ลบเอกสารแล้วประวัติไม่ควรลอย |
+| `approval_log` → `document_status` | Restrict | ห้ามลบสถานะที่มีประวัติอ้างอยู่ |
+| `documents` → `document_status` | Restrict | ห้ามลบสถานะที่มีเอกสารใช้อยู่ |
 
 ### Index
 
-- `Documents.StatusId` — หน้าตารางกรองและเรียงตามสถานะ
-- `ApprovalLog.DocumentId` — ดึงประวัติของเอกสารหนึ่งใบ
-- `DocumentStatus.Code` unique — กันรหัสซ้ำ
+- `documents.status_id` — หน้าตารางกรองและเรียงตามสถานะ
+- `approval_log.document_id` — ดึงประวัติของเอกสารหนึ่งใบ
+- `document_status.status_code` unique — กันรหัสซ้ำ
 
 ## ข้อมูล mockup
 
