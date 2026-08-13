@@ -43,9 +43,11 @@ export class It03Page {
     this.load();
   }
 
-  protected load(): void {
+  protected load(options: { keepError?: boolean } = {}): void {
     this.isLoading.set(true);
-    this.errorMessage.set(null);
+    if (!options.keepError) {
+      this.errorMessage.set(null);
+    }
 
     this.service.getDocuments().subscribe({
       next: (documents) => {
@@ -122,8 +124,9 @@ export class It03Page {
         this.dialogMode.set(null);
         this.errorMessage.set(describeError(error));
         // The batch was rejected server-side, so pull fresh state rather than
-        // trusting what the table currently shows.
-        this.load();
+        // trusting what the table shows. The refresh must not wipe the message
+        // explaining why it was rejected.
+        this.load({ keepError: true });
       },
     });
   }
