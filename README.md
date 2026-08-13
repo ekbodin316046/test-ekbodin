@@ -48,7 +48,7 @@
 dotnet run --project src/Api
 ```
 
-เปิดที่ `http://localhost:5000` — Swagger UI อยู่ที่ `http://localhost:5000/swagger`
+เปิดที่ `http://localhost:5000`
 
 ฐานข้อมูลสร้างและใส่ข้อมูล mockup ให้อัตโนมัติตอนเริ่มทำงาน **ไม่ต้องตั้งค่าอะไรเพิ่ม**
 
@@ -62,18 +62,34 @@ npm start
 
 เปิดที่ `http://localhost:4200`
 
-### 3. รันเทส
+### 3. รัน unit test
+
+รวม **59 เคส** ผ่านทั้งหมด
 
 ```bash
-dotnet test                            # backend 27 เคส
-cd web && npx ng test --watch=false    # frontend 27 เคส
+# backend — 27 เคส (หยุด API ก่อน ไม่งั้นไฟล์ DLL ถูกล็อก)
+dotnet test
+
+# frontend — 32 เคส
+cd web
+npx ng test --watch=false
+```
+
+แยกรันเฉพาะชุดที่ต้องการ
+
+```bash
+dotnet test tests/Domain.Tests     # เฉพาะกฎธุรกิจ 12 เคส
+dotnet test tests/Api.Tests        # เฉพาะ API 15 เคส
+cd web && npx ng test              # โหมดเฝ้าไฟล์ แก้โค้ดแล้วรันใหม่เอง กด q เพื่อออก
 ```
 
 | ชุด | เคส | ครอบอะไร |
 |---|---|---|
 | `tests/Domain.Tests` | 12 | กฎห้ามดำเนินการซ้ำ ระดับ entity ไม่ต้องมีฐานข้อมูล |
 | `tests/Api.Tests` | 15 | ยิง HTTP จริงผ่านทั้ง stack ลงฐานข้อมูลชั่วคราวของแต่ละเคส |
-| `web` (vitest) | 27 | หน้าจอ IT03, dialog, สัญญาของ HTTP, การแปลง error, เมนูข้าง |
+| `web` (vitest) | 32 | หน้าจอ IT03, dialog, สัญญาของ HTTP, การแปลง error, เมนูข้าง, สถานะกำลังโหลด |
+
+`tests/Api.Tests` สร้างไฟล์ฐานข้อมูลชั่วคราวของตัวเองแล้วลบทิ้ง ไม่แตะ `db/app.db`
 
 ---
 
@@ -83,7 +99,7 @@ cd web && npx ng test --watch=false    # frontend 27 เคส
 
 | วิธี | ไฟล์ |
 |---|---|
-| เปิดด้วย DB Browser for SQLite หรือ VS Code extension | `db/app.db` |
+| เปิดด้วย DBeaver, DB Browser for SQLite หรือ VS Code extension | `db/app.db` |
 | อ่านโครงสร้างตารางเป็น SQL | `db/schema.sql` |
 | อ่านข้อมูล mockup เป็น SQL | `db/seed.sql` |
 
@@ -144,7 +160,7 @@ src/
   Domain/           entity และกฎธุรกิจ ไม่ depend อะไรเลย
   Application/      MediatR handler หนึ่งไฟล์ต่อหนึ่ง use case, validator, DTO
   Infrastructure/   EF Core, SQLite, seeder
-  Api/              controller, middleware, Swagger
+  Api/              controller, middleware, การแปลง error เป็น ProblemDetails
 tests/
   Domain.Tests/     กฎธุรกิจระดับ entity ไม่ต้องมีฐานข้อมูล
   Api.Tests/        integration test ยิง HTTP จริงผ่านทั้ง stack
