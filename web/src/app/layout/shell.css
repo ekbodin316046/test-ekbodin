@@ -1,0 +1,46 @@
+.top-strip {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: var(--top-strip-height);
+  background: var(--color-primary);
+  z-index: 999;
+}
+
+.page-content {
+  display: block;
+  min-height: 100vh;
+  padding: calc(var(--header-height) + 20px) 20px 28px;
+  padding-left: calc(var(--sidebar-width) + 20px);
+  transition: padding-left 0.3s ease;
+}
+
+.sidebar-collapsed .page-content {
+  padding-left: 20px;
+}
+
+/* Keeps the table readable instead of stretching it across an ultrawide display,
+   while staying anchored to the sidebar rather than drifting to the centre. */
+.content-inner {
+  max-width: 1500px;
+}
+
+/* Only used on narrow screens, where the sidebar floats over the content. */
+.overlay {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .page-content {
+    padding-left: 20px;
+  }
+
+  .overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 997;
+    background: rgba(0, 0, 0, 0.5);
+  }
+}

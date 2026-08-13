@@ -1,0 +1,24 @@
+@import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap');
+@import './styles/tokens.css';
+@import './styles/components.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Prompt', 'Leelawadee UI', 'Tahoma', system-ui, sans-serif;
+  font-size: 14px;
+  color: var(--color-text);
+  background: var(--color-canvas);
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-weight: 500;
+}

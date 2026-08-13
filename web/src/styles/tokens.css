@@ -1,0 +1,28 @@
+/* Taken from the SLCM theme — see docs/design/04-ui-ux.md */
+:root {
+  --color-primary: #492c79;
+  --color-sidebar: #352b55;
+  --color-sidebar-hover: #524183;
+  --color-sidebar-active: #6f3088;
+
+  --color-blue: #0099e6;
+  --color-green: #12a286;
+  --color-red: #f57676;
+  --color-yellow: #ffbf00;
+
+  --color-text: #212529;
+  --color-muted: #868e96;
+  --color-border: #dee2e6;
+  --color-surface: #ffffff;
+  --color-canvas: #f1f2f6;
+  --color-row-decided: #f7f7f9;
+  --color-disabled-box: #a6a6a6;
+
+  --header-height: 59px;
+  --top-strip-height: 5px;
+  --sidebar-width: 260px;
+
+  --radius: 4px;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.11);
+  --shadow-modal: 0 12px 34px rgba(0, 0, 0, 0.28);
+}

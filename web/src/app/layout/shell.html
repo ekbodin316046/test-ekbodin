@@ -1,0 +1,16 @@
+<div class="page" [class.sidebar-collapsed]="!sidebarOpen()">
+  <div class="top-strip"></div>
+
+  <app-header (menuToggled)="toggleSidebar()" />
+  <app-sidebar [open]="sidebarOpen()" />
+
+  <main class="page-content">
+    <div class="content-inner">
+      <router-outlet />
+    </div>
+  </main>
+
+  @if (sidebarOpen()) {
+    <div class="overlay" (click)="toggleSidebar()"></div>
+  }
+</div>

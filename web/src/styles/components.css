@@ -1,0 +1,248 @@
+/* Shared building blocks so every page reads as one system. Page-specific rules
+   stay in the component stylesheets. */
+
+.breadcrumb {
+  display: flex;
+  gap: 8px;
+  margin: 0 0 14px;
+  color: var(--color-muted);
+  font-size: 12px;
+}
+
+.breadcrumb .current {
+  color: var(--color-primary);
+  font-weight: 500;
+}
+
+.card {
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.card-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.screen-code {
+  padding: 2px 8px;
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+.card-title {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.card-body {
+  padding: 16px;
+}
+
+/* Buttons */
+.btn {
+  min-width: 104px;
+  padding: 7px 16px;
+  border: none;
+  border-radius: var(--radius);
+  color: #fff;
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: filter 0.2s ease;
+}
+
+.btn:not(:disabled):hover {
+  filter: brightness(0.93);
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.btn-approve {
+  background: var(--color-green);
+}
+
+.btn-reject {
+  background: var(--color-red);
+}
+
+.btn-primary {
+  background: var(--color-primary);
+}
+
+.btn-muted {
+  background: #6b6b6b;
+}
+
+/* Tables */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th {
+  padding: 10px 8px;
+  background: var(--color-primary);
+  border: 1px solid #3c2465;
+  color: #fff;
+  font-weight: 500;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.data-table td {
+  padding: 9px 8px;
+  border: 1px solid var(--color-border);
+  text-align: center;
+  vertical-align: middle;
+}
+
+.data-table tbody tr:hover {
+  background: #faf9fc;
+}
+
+/* Rebuilt rather than native so the disabled state reads as the solid grey
+   square shown in the mockup. */
+.tick {
+  appearance: none;
+  position: relative;
+  width: 18px;
+  height: 18px;
+  border: 1px solid #6b6b6b;
+  border-radius: 2px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.tick:disabled {
+  background: var(--color-disabled-box);
+  border-color: #8a8a8a;
+  cursor: not-allowed;
+}
+
+.tick:checked {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.tick:checked::after {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 2px;
+  width: 5px;
+  height: 9px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.tick:focus-visible {
+  outline: 2px solid var(--color-yellow);
+  outline-offset: 2px;
+}
+
+/* Status pill */
+.status {
+  display: inline-block;
+  min-width: 84px;
+  padding: 3px 10px;
+  border-radius: 11px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-pending {
+  background: #fff4d6;
+  color: #8a6100;
+}
+
+.status-approved {
+  background: #dff3ef;
+  color: #0c7a64;
+}
+
+.status-rejected {
+  background: #fde8e8;
+  color: #b23a3a;
+}
+
+/* Alerts */
+.alert {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-left: 4px solid;
+  border-radius: 3px;
+  font-size: 13px;
+}
+
+.alert-error {
+  background: #fdeced;
+  border-color: var(--color-red);
+  color: #a13232;
+}
+
+.alert-success {
+  background: #e3f4f1;
+  border-color: var(--color-green);
+  color: #0c6d59;
+}
+
+/* Modal */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(33, 26, 51, 0.55);
+}
+
+.modal {
+  width: min(560px, 100%);
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-modal);
+  overflow: hidden;
+}
+
+.modal-head {
+  padding: 12px 16px;
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: 500;
+}
+
+.modal-body {
+  padding: 18px 16px 6px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 16px 16px;
+}
+
+.muted {
+  color: var(--color-muted);
+}
