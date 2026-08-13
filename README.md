@@ -65,8 +65,15 @@ npm start
 ### 3. รันเทส
 
 ```bash
-dotnet test
+dotnet test                            # backend 27 เคส
+cd web && npx ng test --watch=false    # frontend 27 เคส
 ```
+
+| ชุด | เคส | ครอบอะไร |
+|---|---|---|
+| `tests/Domain.Tests` | 12 | กฎห้ามดำเนินการซ้ำ ระดับ entity ไม่ต้องมีฐานข้อมูล |
+| `tests/Api.Tests` | 15 | ยิง HTTP จริงผ่านทั้ง stack ลงฐานข้อมูลชั่วคราวของแต่ละเคส |
+| `web` (vitest) | 27 | หน้าจอ IT03, dialog, สัญญาของ HTTP, การแปลง error, เมนูข้าง |
 
 ---
 
@@ -139,7 +146,8 @@ src/
   Infrastructure/   EF Core, SQLite, seeder
   Api/              controller, middleware, Swagger
 tests/
-  Domain.Tests/     11 เคส ครอบกฎห้ามดำเนินการซ้ำ
+  Domain.Tests/     กฎธุรกิจระดับ entity ไม่ต้องมีฐานข้อมูล
+  Api.Tests/        integration test ยิง HTTP จริงผ่านทั้ง stack
 web/                Angular 22
 db/                 ไฟล์ฐานข้อมูลและ SQL script
 docs/               เอกสารออกแบบ
