@@ -1,0 +1,127 @@
+<nav class="breadcrumb" aria-label="ตำแหน่งหน้า">
+  <span>งานเอกสาร</span>
+  <span aria-hidden="true">/</span>
+  <span class="current">อนุมัติเอกสาร</span>
+</nav>
+
+<section class="card">
+  <header class="card-head">
+    <span class="screen-code">IT 03-1</span>
+    <span class="card-title">รายการเอกสารรออนุมัติ</span>
+  </header>
+
+  <div class="card-body">
+    <div class="toolbar">
+      <button
+        type="button"
+        class="btn btn-approve"
+        [disabled]="selectedCount() === 0 || isSaving()"
+        (click)="openDialog('approve')"
+      >
+        อนุมัติ
+      </button>
+
+      <button
+        type="button"
+        class="btn btn-reject"
+        [disabled]="selectedCount() === 0 || isSaving()"
+        (click)="openDialog('reject')"
+      >
+        ไม่อนุมัติ
+      </button>
+
+      <span class="toolbar-note muted">
+        @if (selectedCount() > 0) {
+          เลือกไว้ {{ selectedCount() }} รายการ
+        } @else {
+          เลือกรายการที่รออนุมัติเพื่อดำเนินการ
+        }
+      </span>
+    </div>
+
+    @if (errorMessage()) {
+      <p class="alert alert-error" role="alert">{{ errorMessage() }}</p>
+    }
+    @if (notice()) {
+      <p class="alert alert-success" role="status">{{ notice() }}</p>
+    }
+
+    <div class="table-scroll">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th class="cell-check">
+              <input
+                type="checkbox"
+                class="tick"
+                [checked]="allPendingSelected()"
+                [disabled]="pendingCount() === 0"
+                (change)="toggleAll()"
+                aria-label="เลือกทุกรายการที่รออนุมัติ"
+              />
+            </th>
+            <th>รายการ</th>
+            <th>เหตุผล</th>
+            <th class="cell-status">สถานะเอกสาร</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (document of documents(); track document.id) {
+            <tr [class.decided]="!document.isPending">
+              <td class="cell-check">
+                <input
+                  type="checkbox"
+                  class="tick"
+                  [checked]="isSelected(document.id)"
+                  [disabled]="!document.isPending"
+                  (change)="toggleRow(document)"
+                  [attr.aria-label]="'เลือก ' + document.documentName"
+                />
+              </td>
+
+              <td class="cell-name">
+                <button
+                  type="button"
+                  class="name-link"
+                  title="ดูประวัติการอนุมัติ"
+                  (click)="openHistory(document)"
+                >
+                  {{ document.documentName }}
+                </button>
+              </td>
+
+              <td class="cell-reason">{{ document.reason }}</td>
+
+              <td class="cell-status">
+                <span class="status" [class]="statusClass(document)">{{ document.statusNameTh }}</span>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td class="cell-empty muted" colspan="4">
+                {{ isLoading() ? 'กำลังโหลดข้อมูล...' : 'ไม่พบข้อมูล' }}
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <p class="hint muted">คลิกชื่อรายการเพื่อดูประวัติการอนุมัติ</p>
+  </div>
+</section>
+
+@if (dialogMode(); as mode) {
+  <app-approval-dialog
+    [mode]="mode"
+    [count]="selectedCount()"
+    [saving]="isSaving()"
+    (confirmed)="confirmDecision($event)"
+    (cancelled)="closeDialog()"
+  />
+}
+
+@if (historyDocument(); as document) {
+  <app-history-dialog [document]="document" (closed)="closeHistory()" />
+}

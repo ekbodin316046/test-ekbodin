@@ -1,0 +1,45 @@
+<div class="modal-backdrop" (click)="cancelled.emit()">
+  <div
+    class="modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="approval-dialog-title"
+    (click)="$event.stopPropagation()"
+  >
+    <header class="modal-head" id="approval-dialog-title">{{ title() }}</header>
+
+    <div class="modal-body">
+      <div class="reason-row">
+        <label class="reason-label" for="approval-reason">เหตุผล :</label>
+        <textarea
+          id="approval-reason"
+          class="reason-input"
+          rows="5"
+          maxlength="500"
+          [value]="reason()"
+          [disabled]="saving()"
+          (input)="onReasonInput($event)"
+        ></textarea>
+      </div>
+
+      <p class="count-note muted">มีผลกับรายการที่เลือกไว้ {{ count() }} รายการ</p>
+    </div>
+
+    <footer class="modal-actions">
+      <button
+        type="button"
+        class="btn"
+        [class.btn-approve]="isApprove()"
+        [class.btn-reject]="!isApprove()"
+        [disabled]="!canConfirm()"
+        (click)="submit()"
+      >
+        {{ saving() ? 'กำลังบันทึก...' : confirmLabel() }}
+      </button>
+
+      <button type="button" class="btn btn-muted" [disabled]="saving()" (click)="cancelled.emit()">
+        ยกเลิก
+      </button>
+    </footer>
+  </div>
+</div>

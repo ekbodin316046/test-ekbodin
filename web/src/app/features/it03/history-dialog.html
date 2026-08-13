@@ -1,0 +1,54 @@
+<div class="modal-backdrop" (click)="closed.emit()">
+  <div
+    class="modal wide"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="history-dialog-title"
+    (click)="$event.stopPropagation()"
+  >
+    <header class="modal-head" id="history-dialog-title">
+      ประวัติการอนุมัติ — {{ document().documentName }}
+    </header>
+
+    <div class="modal-body">
+      @if (isLoading()) {
+        <p class="state muted">กำลังโหลดข้อมูล...</p>
+      } @else if (errorMessage()) {
+        <p class="alert alert-error" role="alert">{{ errorMessage() }}</p>
+      } @else {
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>จากสถานะ</th>
+                <th>เป็นสถานะ</th>
+                <th>เหตุผล</th>
+                <th>ผู้ดำเนินการ</th>
+                <th>วันที่</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (entry of entries(); track entry.id) {
+                <tr>
+                  <td>{{ entry.fromStatusNameTh }}</td>
+                  <td>{{ entry.toStatusNameTh }}</td>
+                  <td class="reason">{{ entry.reason }}</td>
+                  <td>{{ entry.actionBy }}</td>
+                  <td class="date">{{ formatDate(entry.actionAt) }}</td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td class="state muted" colspan="5">ยังไม่มีประวัติการดำเนินการ</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+
+    <footer class="modal-actions">
+      <button type="button" class="btn btn-muted" (click)="closed.emit()">ปิด</button>
+    </footer>
+  </div>
+</div>

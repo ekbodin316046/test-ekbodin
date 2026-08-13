@@ -1,0 +1,25 @@
+.modal.wide {
+  width: min(820px, 100%);
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.data-table {
+  font-size: 13px;
+}
+
+.data-table .reason {
+  text-align: left;
+}
+
+.data-table .date {
+  white-space: nowrap;
+}
+
+.state {
+  margin: 0;
+  padding: 20px;
+  text-align: center;
+}

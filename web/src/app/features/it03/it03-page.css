@@ -1,0 +1,64 @@
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.toolbar-note {
+  font-size: 12px;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.cell-check {
+  width: 58px;
+}
+
+.cell-status {
+  width: 160px;
+}
+
+tr.decided {
+  background: var(--color-row-decided);
+}
+
+.name-link {
+  padding: 0;
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  transition: text-decoration-color 0.2s ease;
+}
+
+.name-link:hover,
+.name-link:focus-visible {
+  text-decoration-color: currentColor;
+}
+
+.cell-reason {
+  text-align: left;
+  font-size: 13px;
+}
+
+.cell-empty {
+  padding: 26px;
+}
+
+.hint {
+  margin: 12px 0 0;
+  font-size: 12px;
+}
+
+@media (max-width: 640px) {
+  .toolbar {
+    flex-wrap: wrap;
+  }
+}

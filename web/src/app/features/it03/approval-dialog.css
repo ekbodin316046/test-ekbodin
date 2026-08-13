@@ -1,0 +1,40 @@
+.reason-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.reason-label {
+  padding-top: 7px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.reason-input {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1px solid #b6b6bd;
+  border-radius: var(--radius);
+  font: inherit;
+  resize: vertical;
+}
+
+.reason-input:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
+}
+
+.count-note {
+  margin: 10px 0 0;
+  font-size: 12px;
+}
+
+@media (max-width: 520px) {
+  .reason-row {
+    flex-direction: column;
+  }
+
+  .reason-input {
+    width: 100%;
+  }
+}
