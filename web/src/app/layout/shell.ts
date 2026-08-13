@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
 import { AppHeader } from './header';
@@ -15,15 +15,26 @@ const NARROW_VIEWPORT = '(max-width: 900px)';
   styleUrl: './shell.css',
 })
 export class Shell {
+  private readonly viewport = window.matchMedia?.(NARROW_VIEWPORT);
+
   // Opening by default on a phone would greet the user with the overlay
   // covering the page they came to read.
-  protected readonly sidebarOpen = signal(!isNarrowViewport());
+  protected readonly sidebarOpen = signal(!this.viewport?.matches);
+
+  constructor() {
+    if (!this.viewport) {
+      return;
+    }
+
+    // Crossing the breakpoint changes what the sidebar means, so the answer
+    // from load time stops applying.
+    const onViewportChange = (event: MediaQueryListEvent) => this.sidebarOpen.set(!event.matches);
+
+    this.viewport.addEventListener('change', onViewportChange);
+    inject(DestroyRef).onDestroy(() => this.viewport?.removeEventListener('change', onViewportChange));
+  }
 
   protected toggleSidebar(): void {
     this.sidebarOpen.update((open) => !open);
   }
-}
-
-function isNarrowViewport(): boolean {
-  return window.matchMedia?.(NARROW_VIEWPORT).matches === true;
 }

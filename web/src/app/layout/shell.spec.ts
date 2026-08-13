@@ -3,27 +3,41 @@ import { provideRouter } from '@angular/router';
 
 import { Shell } from './shell';
 
+type ChangeHandler = (event: MediaQueryListEvent) => void;
+
 describe('Shell', () => {
   let fixture: ComponentFixture<Shell>;
+  let handlers: ChangeHandler[];
   const realMatchMedia = window.matchMedia;
 
-  // jsdom ships no matchMedia, so the viewport has to be declared per test.
+  // jsdom ships no matchMedia, so the viewport has to be declared per test. The
+  // stub keeps its listeners so a test can move the breakpoint afterwards.
   function stubViewport(narrow: boolean): void {
+    handlers = [];
+
     window.matchMedia = ((query: string) =>
       ({
         matches: narrow && query.includes('900px'),
         media: query,
         onchange: null,
-        addEventListener: () => undefined,
-        removeEventListener: () => undefined,
+        addEventListener: (_: string, handler: ChangeHandler) => handlers.push(handler),
+        removeEventListener: (_: string, handler: ChangeHandler) => {
+          handlers = handlers.filter((existing) => existing !== handler);
+        },
         addListener: () => undefined,
         removeListener: () => undefined,
         dispatchEvent: () => false,
-      }) as MediaQueryList) as typeof window.matchMedia;
+      }) as unknown as MediaQueryList) as typeof window.matchMedia;
   }
 
   async function render(): Promise<void> {
     fixture = TestBed.createComponent(Shell);
+    fixture.detectChanges();
+    await fixture.whenStable();
+  }
+
+  async function crossBreakpoint(narrow: boolean): Promise<void> {
+    handlers.forEach((handler) => handler({ matches: narrow } as MediaQueryListEvent));
     fixture.detectChanges();
     await fixture.whenStable();
   }
@@ -89,6 +103,35 @@ describe('Shell', () => {
 
     expect(sidebarIsClosed()).toBe(true);
     expect(overlay()).toBeNull();
+  });
+
+  it('closes the sidebar when the window shrinks past the breakpoint', async () => {
+    stubViewport(false);
+    await render();
+
+    await crossBreakpoint(true);
+
+    expect(sidebarIsClosed()).toBe(true);
+    expect(overlay()).toBeNull();
+  });
+
+  it('reopens the sidebar when the window grows past the breakpoint', async () => {
+    stubViewport(true);
+    await render();
+
+    await crossBreakpoint(false);
+
+    expect(sidebarIsClosed()).toBe(false);
+  });
+
+  it('stops listening to the viewport once destroyed', async () => {
+    stubViewport(false);
+    await render();
+    expect(handlers).toHaveLength(1);
+
+    fixture.destroy();
+
+    expect(handlers).toHaveLength(0);
   });
 
   it('falls back to an open sidebar where matchMedia is unavailable', async () => {
