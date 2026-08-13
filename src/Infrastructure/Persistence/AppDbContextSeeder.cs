@@ -9,6 +9,9 @@ namespace Infrastructure.Persistence;
 public static class AppDbContextSeeder
 {
     private static readonly DateTime BaseDate = new(2026, 8, 1, 9, 0, 0, DateTimeKind.Utc);
+    private const string SeedUser = "SYSTEM";
+    private const string SeedProgram = "SEED";
+    private const string ScreenProgram = "IT03";
 
     public static async Task SeedAsync(AppDbContext context, CancellationToken cancellationToken = default)
     {
@@ -40,22 +43,23 @@ public static class AppDbContextSeeder
                 DocumentName = $"รายการที่ {row}",
                 Reason = reason,
                 StatusId = (int)status,
-                CreatedAt = createdAt,
-                UpdatedAt = createdAt,
             };
+            document.StampCreated(SeedUser, SeedProgram, createdAt);
 
             if (status != DocumentStatusCode.Pending)
             {
                 var decidedAt = createdAt.AddDays(1);
-                document.UpdatedAt = decidedAt;
-                document.ApprovalLogs.Add(new ApprovalLog
+                document.StampUpdated(actionBy!, ScreenProgram, decidedAt);
+
+                var log = new ApprovalLog
                 {
                     FromStatusId = (int)DocumentStatusCode.Pending,
                     ToStatusId = (int)status,
                     Reason = reason,
-                    ActionBy = actionBy!,
-                    ActionAt = decidedAt,
-                });
+                };
+                log.StampCreated(actionBy!, ScreenProgram, decidedAt);
+
+                document.ApprovalLogs.Add(log);
             }
 
             context.Documents.Add(document);

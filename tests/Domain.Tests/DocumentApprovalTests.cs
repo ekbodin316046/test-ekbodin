@@ -7,16 +7,21 @@ namespace Domain.Tests;
 public class DocumentApprovalTests
 {
     private static readonly DateTime Now = new(2026, 8, 13, 21, 0, 0, DateTimeKind.Utc);
+    private const string Program = "IT03";
 
-    private static Document PendingDocument() => new()
+    private static Document PendingDocument()
     {
-        Id = 1,
-        DocumentName = "รายการที่ 1",
-        Reason = "xxxxx",
-        StatusId = (int)DocumentStatusCode.Pending,
-        CreatedAt = Now.AddDays(-1),
-        UpdatedAt = Now.AddDays(-1),
-    };
+        var document = new Document
+        {
+            Id = 1,
+            DocumentName = "รายการที่ 1",
+            Reason = "xxxxx",
+            StatusId = (int)DocumentStatusCode.Pending,
+        };
+        document.StampCreated("SYSTEM", "SEED", Now.AddDays(-1));
+
+        return document;
+    }
 
     private static Document DocumentWith(DocumentStatusCode status)
     {
@@ -30,12 +35,12 @@ public class DocumentApprovalTests
     {
         var document = PendingDocument();
 
-        document.ChangeStatus(DocumentStatusCode.Approved, "งบประมาณถูกต้อง", "somchai", Now);
+        document.ChangeStatus(DocumentStatusCode.Approved, "งบประมาณถูกต้อง", "somchai", Program, Now);
 
         Assert.Equal((int)DocumentStatusCode.Approved, document.StatusId);
         Assert.False(document.IsPending);
         Assert.Equal("งบประมาณถูกต้อง", document.Reason);
-        Assert.Equal(Now, document.UpdatedAt);
+        Assert.Equal(Now, document.UpdatedDate);
     }
 
     [Fact]
@@ -43,7 +48,7 @@ public class DocumentApprovalTests
     {
         var document = PendingDocument();
 
-        document.ChangeStatus(DocumentStatusCode.Rejected, "เอกสารไม่ครบ", "somchai", Now);
+        document.ChangeStatus(DocumentStatusCode.Rejected, "เอกสารไม่ครบ", "somchai", Program, Now);
 
         Assert.Equal((int)DocumentStatusCode.Rejected, document.StatusId);
         Assert.False(document.IsPending);
@@ -55,15 +60,36 @@ public class DocumentApprovalTests
     {
         var document = PendingDocument();
 
-        var log = document.ChangeStatus(DocumentStatusCode.Approved, "  ผ่านการตรวจสอบ  ", "somchai", Now);
+        var log = document.ChangeStatus(
+            DocumentStatusCode.Approved, "  ผ่านการตรวจสอบ  ", "somchai", Program, Now);
 
         Assert.Equal(1, log.DocumentId);
         Assert.Equal((int)DocumentStatusCode.Pending, log.FromStatusId);
         Assert.Equal((int)DocumentStatusCode.Approved, log.ToStatusId);
         Assert.Equal("ผ่านการตรวจสอบ", log.Reason);
-        Assert.Equal("somchai", log.ActionBy);
-        Assert.Equal(Now, log.ActionAt);
+        Assert.Equal("somchai", log.CreatedBy);
+        Assert.Equal(Now, log.CreatedDate);
         Assert.Single(document.ApprovalLogs);
+    }
+
+    [Fact]
+    public void A_decision_stamps_the_actor_and_screen_on_both_rows()
+    {
+        var document = PendingDocument();
+
+        var log = document.ChangeStatus(
+            DocumentStatusCode.Approved, "ผ่านการตรวจสอบ", "somchai", Program, Now);
+
+        Assert.Equal(Program, log.CreatedProgram);
+        Assert.Equal(Program, log.UpdatedProgram);
+        Assert.Equal("somchai", log.UpdatedBy);
+
+        // The document keeps the stamp of whoever created it and gains the
+        // approver only on the update columns.
+        Assert.Equal("SYSTEM", document.CreatedBy);
+        Assert.Equal("SEED", document.CreatedProgram);
+        Assert.Equal("somchai", document.UpdatedBy);
+        Assert.Equal(Program, document.UpdatedProgram);
     }
 
     // The rule the exam calls out: "การที่อนุมัติแล้ว จะไม่สามารถเลือกอนุมัติซ้ำได้"
@@ -79,7 +105,7 @@ public class DocumentApprovalTests
         var document = DocumentWith(current);
 
         var error = Assert.Throws<BusinessRuleException>(
-            () => document.ChangeStatus(attempted, "เหตุผล", "somchai", Now));
+            () => document.ChangeStatus(attempted, "เหตุผล", "somchai", Program, Now));
 
         Assert.Contains("ไม่สามารถดำเนินการซ้ำได้", error.Message);
         Assert.Equal((int)current, document.StatusId);
@@ -92,7 +118,7 @@ public class DocumentApprovalTests
         var document = PendingDocument();
 
         Assert.Throws<BusinessRuleException>(
-            () => document.ChangeStatus(DocumentStatusCode.Pending, "เหตุผล", "somchai", Now));
+            () => document.ChangeStatus(DocumentStatusCode.Pending, "เหตุผล", "somchai", Program, Now));
     }
 
     [Theory]
@@ -103,7 +129,7 @@ public class DocumentApprovalTests
         var document = PendingDocument();
 
         var error = Assert.Throws<BusinessRuleException>(
-            () => document.ChangeStatus(DocumentStatusCode.Approved, reason, "somchai", Now));
+            () => document.ChangeStatus(DocumentStatusCode.Approved, reason, "somchai", Program, Now));
 
         Assert.Equal("กรุณากรอกเหตุผล", error.Message);
         Assert.True(document.IsPending);
@@ -114,12 +140,14 @@ public class DocumentApprovalTests
     {
         var document = DocumentWith(DocumentStatusCode.Approved);
         var reasonBefore = document.Reason;
-        var updatedBefore = document.UpdatedAt;
+        var updatedBefore = document.UpdatedDate;
+        var updatedByBefore = document.UpdatedBy;
 
         Assert.Throws<BusinessRuleException>(
-            () => document.ChangeStatus(DocumentStatusCode.Rejected, "เปลี่ยนใจ", "somchai", Now));
+            () => document.ChangeStatus(DocumentStatusCode.Rejected, "เปลี่ยนใจ", "somchai", Program, Now));
 
         Assert.Equal(reasonBefore, document.Reason);
-        Assert.Equal(updatedBefore, document.UpdatedAt);
+        Assert.Equal(updatedBefore, document.UpdatedDate);
+        Assert.Equal(updatedByBefore, document.UpdatedBy);
     }
 }

@@ -1,6 +1,8 @@
+using Domain.Common;
+
 namespace Domain.Entities;
 
-public class DocumentStatus
+public class DocumentStatus : AuditableEntity
 {
     public int Id { get; set; }
     public string Code { get; set; } = string.Empty;

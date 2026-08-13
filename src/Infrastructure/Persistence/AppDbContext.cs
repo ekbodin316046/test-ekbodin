@@ -1,4 +1,5 @@
 using Application.Common.Interfaces;
+using Domain.Common;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -7,8 +8,12 @@ namespace Infrastructure.Persistence;
 
 public class AppDbContext : DbContext, IAppDbContext
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+    private readonly ICurrentUserAccessor _currentUser;
+
+    public AppDbContext(DbContextOptions<AppDbContext> options, ICurrentUserAccessor currentUser)
+        : base(options)
     {
+        _currentUser = currentUser;
     }
 
     public DbSet<Document> Documents => Set<Document>();
@@ -25,9 +30,39 @@ public class AppDbContext : DbContext, IAppDbContext
         CancellationToken cancellationToken = default) =>
         transaction.CommitAsync(cancellationToken);
 
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        StampAuditColumns();
+
+        return base.SaveChangesAsync(cancellationToken);
+    }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
         base.OnModelCreating(modelBuilder);
+    }
+
+    // The audit columns are NOT NULL, so nothing may reach the database without
+    // them. An inserted row that already carries a stamp keeps it, because the
+    // seeder backdates its history on purpose; an update always takes the
+    // current stamp regardless of what the caller set.
+    private void StampAuditColumns()
+    {
+        var now = DateTime.UtcNow;
+        var user = _currentUser.UserName;
+        var program = _currentUser.ProgramCode;
+
+        foreach (var entry in ChangeTracker.Entries<AuditableEntity>())
+        {
+            if (entry.State == EntityState.Added && string.IsNullOrEmpty(entry.Entity.CreatedBy))
+            {
+                entry.Entity.StampCreated(user, program, now);
+            }
+            else if (entry.State == EntityState.Modified)
+            {
+                entry.Entity.StampUpdated(user, program, now);
+            }
+        }
     }
 }

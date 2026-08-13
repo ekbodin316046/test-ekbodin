@@ -8,19 +8,28 @@ public class ApprovalLogConfiguration : IEntityTypeConfiguration<ApprovalLog>
 {
     public void Configure(EntityTypeBuilder<ApprovalLog> builder)
     {
-        builder.ToTable("ApprovalLog");
+        builder.ToTable("approval_log");
 
         builder.HasKey(log => log.Id);
 
+        builder.Property(log => log.Id)
+            .HasColumnName("approval_log_id");
+
+        builder.Property(log => log.DocumentId)
+            .HasColumnName("document_id");
+
+        builder.Property(log => log.FromStatusId)
+            .HasColumnName("from_status_id");
+
+        builder.Property(log => log.ToStatusId)
+            .HasColumnName("to_status_id");
+
         builder.Property(log => log.Reason)
+            .HasColumnName("reason")
             .HasMaxLength(500)
             .IsRequired();
 
-        builder.Property(log => log.ActionBy)
-            .HasMaxLength(100)
-            .IsRequired();
-
-        builder.Property(log => log.ActionAt).IsRequired();
+        builder.HasAuditColumns();
 
         builder.HasOne(log => log.Document)
             .WithMany(document => document.ApprovalLogs)

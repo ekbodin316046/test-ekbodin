@@ -1,7 +1,10 @@
+using Domain.Common;
+
 namespace Domain.Entities;
 
-// One row per status transition. Never updated or deleted.
-public class ApprovalLog
+// One row per status transition. Never updated or deleted, so the audit columns
+// double as the record of who decided and when.
+public class ApprovalLog : AuditableEntity
 {
     public int Id { get; set; }
     public int DocumentId { get; set; }
@@ -14,6 +17,4 @@ public class ApprovalLog
     public DocumentStatus? ToStatus { get; set; }
 
     public string Reason { get; set; } = string.Empty;
-    public string ActionBy { get; set; } = string.Empty;
-    public DateTime ActionAt { get; set; }
 }

@@ -8,19 +8,26 @@ public class DocumentConfiguration : IEntityTypeConfiguration<Document>
 {
     public void Configure(EntityTypeBuilder<Document> builder)
     {
-        builder.ToTable("Documents");
+        builder.ToTable("documents");
 
         builder.HasKey(document => document.Id);
 
+        builder.Property(document => document.Id)
+            .HasColumnName("document_id");
+
         builder.Property(document => document.DocumentName)
+            .HasColumnName("document_name")
             .HasMaxLength(200)
             .IsRequired();
 
         builder.Property(document => document.Reason)
+            .HasColumnName("reason")
             .HasMaxLength(500);
 
-        builder.Property(document => document.CreatedAt).IsRequired();
-        builder.Property(document => document.UpdatedAt).IsRequired();
+        builder.Property(document => document.StatusId)
+            .HasColumnName("status_id");
+
+        builder.HasAuditColumns();
 
         builder.HasOne(document => document.Status)
             .WithMany()

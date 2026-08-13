@@ -34,7 +34,7 @@ public static class GetApprovalHistory
             return await _context.ApprovalLogs
                 .AsNoTracking()
                 .Where(log => log.DocumentId == request.DocumentId)
-                .OrderByDescending(log => log.ActionAt)
+                .OrderByDescending(log => log.CreatedDate)
                 .ThenByDescending(log => log.Id)
                 .Select(log => new ApprovalLogDto(
                     log.Id,
@@ -42,8 +42,8 @@ public static class GetApprovalHistory
                     log.FromStatus!.NameTh,
                     log.ToStatus!.NameTh,
                     log.Reason,
-                    log.ActionBy,
-                    log.ActionAt))
+                    log.CreatedBy,
+                    log.CreatedDate))
                 .ToListAsync(cancellationToken);
         }
     }

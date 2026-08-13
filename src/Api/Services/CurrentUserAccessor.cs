@@ -5,6 +5,7 @@ namespace Api.Services;
 public class CurrentUserAccessor : ICurrentUserAccessor
 {
     private const string DefaultUserName = "demo.user";
+    private const string DefaultProgramCode = "IT03";
 
     private readonly IHttpContextAccessor _httpContextAccessor;
 
@@ -14,13 +15,16 @@ public class CurrentUserAccessor : ICurrentUserAccessor
     }
 
     // No authentication in scope, so the caller may name itself via a header.
-    public string UserName
-    {
-        get
-        {
-            var header = _httpContextAccessor.HttpContext?.Request.Headers["X-User"].ToString();
+    public string UserName => HeaderOr("X-User", DefaultUserName);
 
-            return string.IsNullOrWhiteSpace(header) ? DefaultUserName : header.Trim();
-        }
+    // The screen that owns the request. A second screen writing these tables
+    // would send its own code without any change here.
+    public string ProgramCode => HeaderOr("X-Program", DefaultProgramCode);
+
+    private string HeaderOr(string name, string fallback)
+    {
+        var header = _httpContextAccessor.HttpContext?.Request.Headers[name].ToString();
+
+        return string.IsNullOrWhiteSpace(header) ? fallback : header.Trim();
     }
 }

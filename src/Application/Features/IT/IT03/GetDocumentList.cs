@@ -34,8 +34,8 @@ public static class GetDocumentList
                     document.Status!.Code,
                     document.Status!.NameTh,
                     document.StatusId == (int)DocumentStatusCode.Pending,
-                    document.CreatedAt,
-                    document.UpdatedAt))
+                    document.CreatedDate,
+                    document.UpdatedDate))
                 .ToListAsync(cancellationToken);
         }
     }

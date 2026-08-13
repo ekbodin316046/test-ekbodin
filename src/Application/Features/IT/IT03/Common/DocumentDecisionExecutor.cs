@@ -39,12 +39,13 @@ public class DocumentDecisionExecutor
 
         var now = DateTime.UtcNow;
         var actionBy = _currentUser.UserName;
+        var program = _currentUser.ProgramCode;
 
         foreach (var document in documents)
         {
             // Throwing here aborts the whole batch rather than silently skipping
             // a row the caller believed it had selected.
-            var log = document.ChangeStatus(toStatus, reason, actionBy, now);
+            var log = document.ChangeStatus(toStatus, reason, actionBy, program, now);
             _context.ApprovalLogs.Add(log);
         }
 

@@ -1,9 +1,10 @@
+using Domain.Common;
 using Domain.Enums;
 using Domain.Exceptions;
 
 namespace Domain.Entities;
 
-public class Document
+public class Document : AuditableEntity
 {
     public int Id { get; set; }
     public string DocumentName { get; set; } = string.Empty;
@@ -15,9 +16,6 @@ public class Document
     public int StatusId { get; set; }
     public DocumentStatus? Status { get; set; }
 
-    public DateTime CreatedAt { get; set; }
-    public DateTime UpdatedAt { get; set; }
-
     public ICollection<ApprovalLog> ApprovalLogs { get; set; } = new List<ApprovalLog>();
 
     public bool IsPending => StatusId == (int)DocumentStatusCode.Pending;
@@ -26,6 +24,7 @@ public class Document
         DocumentStatusCode toStatus,
         string reason,
         string actionBy,
+        string program,
         DateTime now)
     {
         if (toStatus is not (DocumentStatusCode.Approved or DocumentStatusCode.Rejected))
@@ -55,13 +54,12 @@ public class Document
             FromStatusId = StatusId,
             ToStatusId = (int)toStatus,
             Reason = trimmedReason,
-            ActionBy = actionBy,
-            ActionAt = now,
         };
+        log.StampCreated(actionBy, program, now);
 
         StatusId = (int)toStatus;
         Reason = trimmedReason;
-        UpdatedAt = now;
+        StampUpdated(actionBy, program, now);
         ApprovalLogs.Add(log);
 
         return log;
