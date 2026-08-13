@@ -4,60 +4,74 @@
 );
 
 BEGIN TRANSACTION;
-CREATE TABLE "DocumentStatus" (
-    "Id" INTEGER NOT NULL CONSTRAINT "PK_DocumentStatus" PRIMARY KEY,
-    "Code" TEXT NOT NULL,
-    "NameTh" TEXT NOT NULL
+CREATE TABLE "document_status" (
+    "status_id" INTEGER NOT NULL CONSTRAINT "PK_document_status" PRIMARY KEY,
+    "status_code" TEXT NOT NULL,
+    "status_name_tha" TEXT NOT NULL,
+    "created_by" TEXT NOT NULL,
+    "created_date" TEXT NOT NULL,
+    "created_program" TEXT NOT NULL,
+    "updated_by" TEXT NOT NULL,
+    "updated_date" TEXT NOT NULL,
+    "updated_program" TEXT NOT NULL
 );
 
-CREATE TABLE "Documents" (
-    "Id" INTEGER NOT NULL CONSTRAINT "PK_Documents" PRIMARY KEY AUTOINCREMENT,
-    "DocumentName" TEXT NOT NULL,
-    "Reason" TEXT NULL,
-    "StatusId" INTEGER NOT NULL,
-    "CreatedAt" TEXT NOT NULL,
-    "UpdatedAt" TEXT NOT NULL,
-    CONSTRAINT "FK_Documents_DocumentStatus_StatusId" FOREIGN KEY ("StatusId") REFERENCES "DocumentStatus" ("Id") ON DELETE RESTRICT
+CREATE TABLE "documents" (
+    "document_id" INTEGER NOT NULL CONSTRAINT "PK_documents" PRIMARY KEY AUTOINCREMENT,
+    "document_name" TEXT NOT NULL,
+    "reason" TEXT NULL,
+    "status_id" INTEGER NOT NULL,
+    "created_by" TEXT NOT NULL,
+    "created_date" TEXT NOT NULL,
+    "created_program" TEXT NOT NULL,
+    "updated_by" TEXT NOT NULL,
+    "updated_date" TEXT NOT NULL,
+    "updated_program" TEXT NOT NULL,
+    CONSTRAINT "FK_documents_document_status_status_id" FOREIGN KEY ("status_id") REFERENCES "document_status" ("status_id") ON DELETE RESTRICT
 );
 
-CREATE TABLE "ApprovalLog" (
-    "Id" INTEGER NOT NULL CONSTRAINT "PK_ApprovalLog" PRIMARY KEY AUTOINCREMENT,
-    "DocumentId" INTEGER NOT NULL,
-    "FromStatusId" INTEGER NOT NULL,
-    "ToStatusId" INTEGER NOT NULL,
-    "Reason" TEXT NOT NULL,
-    "ActionBy" TEXT NOT NULL,
-    "ActionAt" TEXT NOT NULL,
-    CONSTRAINT "FK_ApprovalLog_DocumentStatus_FromStatusId" FOREIGN KEY ("FromStatusId") REFERENCES "DocumentStatus" ("Id") ON DELETE RESTRICT,
-    CONSTRAINT "FK_ApprovalLog_DocumentStatus_ToStatusId" FOREIGN KEY ("ToStatusId") REFERENCES "DocumentStatus" ("Id") ON DELETE RESTRICT,
-    CONSTRAINT "FK_ApprovalLog_Documents_DocumentId" FOREIGN KEY ("DocumentId") REFERENCES "Documents" ("Id") ON DELETE CASCADE
+CREATE TABLE "approval_log" (
+    "approval_log_id" INTEGER NOT NULL CONSTRAINT "PK_approval_log" PRIMARY KEY AUTOINCREMENT,
+    "document_id" INTEGER NOT NULL,
+    "from_status_id" INTEGER NOT NULL,
+    "to_status_id" INTEGER NOT NULL,
+    "reason" TEXT NOT NULL,
+    "created_by" TEXT NOT NULL,
+    "created_date" TEXT NOT NULL,
+    "created_program" TEXT NOT NULL,
+    "updated_by" TEXT NOT NULL,
+    "updated_date" TEXT NOT NULL,
+    "updated_program" TEXT NOT NULL,
+    CONSTRAINT "FK_approval_log_document_status_from_status_id" FOREIGN KEY ("from_status_id") REFERENCES "document_status" ("status_id") ON DELETE RESTRICT,
+    CONSTRAINT "FK_approval_log_document_status_to_status_id" FOREIGN KEY ("to_status_id") REFERENCES "document_status" ("status_id") ON DELETE RESTRICT,
+    CONSTRAINT "FK_approval_log_documents_document_id" FOREIGN KEY ("document_id") REFERENCES "documents" ("document_id") ON DELETE CASCADE
 );
 
-INSERT INTO "DocumentStatus" ("Id", "Code", "NameTh")
-VALUES (1, 'PENDING', 'รออนุมัติ');
+INSERT INTO "document_status" ("status_id", "status_code", "created_by", "created_date", "created_program", "status_name_tha", "updated_by", "updated_date", "updated_program")
+VALUES (1, 'PENDING', 'SYSTEM', '2026-08-01 09:00:00', 'SEED', 'รออนุมัติ', 'SYSTEM', '2026-08-01 09:00:00', 'SEED');
 SELECT changes();
 
-INSERT INTO "DocumentStatus" ("Id", "Code", "NameTh")
-VALUES (2, 'APPROVED', 'อนุมัติ');
+INSERT INTO "document_status" ("status_id", "status_code", "created_by", "created_date", "created_program", "status_name_tha", "updated_by", "updated_date", "updated_program")
+VALUES (2, 'APPROVED', 'SYSTEM', '2026-08-01 09:00:00', 'SEED', 'อนุมัติ', 'SYSTEM', '2026-08-01 09:00:00', 'SEED');
 SELECT changes();
 
-INSERT INTO "DocumentStatus" ("Id", "Code", "NameTh")
-VALUES (3, 'REJECTED', 'ไม่อนุมัติ');
+INSERT INTO "document_status" ("status_id", "status_code", "created_by", "created_date", "created_program", "status_name_tha", "updated_by", "updated_date", "updated_program")
+VALUES (3, 'REJECTED', 'SYSTEM', '2026-08-01 09:00:00', 'SEED', 'ไม่อนุมัติ', 'SYSTEM', '2026-08-01 09:00:00', 'SEED');
 SELECT changes();
 
 
-CREATE INDEX "IX_ApprovalLog_DocumentId" ON "ApprovalLog" ("DocumentId");
+CREATE INDEX "IX_approval_log_document_id" ON "approval_log" ("document_id");
 
-CREATE INDEX "IX_ApprovalLog_FromStatusId" ON "ApprovalLog" ("FromStatusId");
+CREATE INDEX "IX_approval_log_from_status_id" ON "approval_log" ("from_status_id");
 
-CREATE INDEX "IX_ApprovalLog_ToStatusId" ON "ApprovalLog" ("ToStatusId");
+CREATE INDEX "IX_approval_log_to_status_id" ON "approval_log" ("to_status_id");
 
-CREATE INDEX "IX_Documents_StatusId" ON "Documents" ("StatusId");
+CREATE UNIQUE INDEX "IX_document_status_status_code" ON "document_status" ("status_code");
 
-CREATE UNIQUE INDEX "IX_DocumentStatus_Code" ON "DocumentStatus" ("Code");
+CREATE INDEX "IX_documents_status_id" ON "documents" ("status_id");
 
 INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
-VALUES ('20260813114449_InitialCreate', '10.0.11');
+VALUES ('20260813144958_InitialCreate', '10.0.11');
 
 COMMIT;
 
