@@ -57,3 +57,7 @@ app.UseSwaggerUI(options =>
 app.MapControllers();
 
 app.Run();
+
+// Top-level statements compile to an internal entry point; WebApplicationFactory
+// in Api.Tests needs a public handle on it.
+public partial class Program;
