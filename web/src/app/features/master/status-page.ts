@@ -3,9 +3,11 @@ import { Component, inject, signal } from '@angular/core';
 import { It03Service } from '../../core/it03.service';
 import { DocumentStatusItem } from '../../core/models/it03.models';
 import { describeError } from '../../core/problem-details';
+import { Spinner } from '../../shared/spinner';
 
 @Component({
   selector: 'app-status-page',
+  imports: [Spinner],
   templateUrl: './status-page.html',
   styleUrl: './status-page.css',
 })

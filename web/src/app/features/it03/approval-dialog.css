@@ -29,6 +29,13 @@
   font-size: 12px;
 }
 
+.spinner-inline {
+  width: 13px;
+  height: 13px;
+  margin-inline-end: 6px;
+  vertical-align: -1px;
+}
+
 @media (max-width: 520px) {
   .reason-row {
     flex-direction: column;

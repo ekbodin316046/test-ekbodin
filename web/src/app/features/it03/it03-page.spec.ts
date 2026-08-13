@@ -206,4 +206,53 @@ describe('It03Page', () => {
     expect(history.textContent).toContain('ใบเบิกวัสดุสำนักงาน');
     expect(history.textContent).toContain('demo.user');
   });
+
+  it('marks the card busy while refreshing rows that are already on screen', async () => {
+    await select(0);
+    approveButton().click();
+    await settle();
+    await fillReason('เอกสารครบถ้วน');
+    dialogButtons()[0].click();
+    await settle();
+
+    http.expectOne('/api/it03/documents/approve').flush({
+      affectedCount: 1,
+      documentIds: [1],
+      statusNameTh: 'อนุมัติ',
+    });
+    await settle();
+
+    // The reload is in flight; the table stays visible behind the bar.
+    expect(fixture.nativeElement.querySelector('.loading-bar')).not.toBeNull();
+    expect(rowCheckboxes()).toHaveLength(3);
+
+    http.expectOne('/api/it03/documents').flush(DOCUMENTS);
+    await settle();
+
+    expect(fixture.nativeElement.querySelector('.loading-bar')).toBeNull();
+  });
+});
+
+describe('It03Page before its first response arrives', () => {
+  it('shows a spinner rather than an empty table', async () => {
+    TestBed.configureTestingModule({
+      imports: [It03Page],
+      providers: [provideHttpClient(), provideHttpClientTesting()],
+    });
+
+    const http = TestBed.inject(HttpTestingController);
+    const fixture = TestBed.createComponent(It03Page);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(fixture.nativeElement.querySelector('app-spinner')).not.toBeNull();
+
+    http.expectOne('/api/it03/documents').flush([]);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(fixture.nativeElement.querySelector('app-spinner')).toBeNull();
+    expect(fixture.nativeElement.textContent).toContain('ไม่พบข้อมูล');
+    http.verify();
+  });
 });

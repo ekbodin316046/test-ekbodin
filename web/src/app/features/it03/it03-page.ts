@@ -3,12 +3,13 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { It03Service } from '../../core/it03.service';
 import { DecisionMode, DocumentListItem } from '../../core/models/it03.models';
 import { describeError } from '../../core/problem-details';
+import { Spinner } from '../../shared/spinner';
 import { ApprovalDialog } from './approval-dialog';
 import { HistoryDialog } from './history-dialog';
 
 @Component({
   selector: 'app-it03-page',
-  imports: [ApprovalDialog, HistoryDialog],
+  imports: [ApprovalDialog, HistoryDialog, Spinner],
   templateUrl: './it03-page.html',
   styleUrl: './it03-page.css',
 })

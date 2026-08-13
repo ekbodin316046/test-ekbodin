@@ -3,6 +3,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { It03Service } from '../../core/it03.service';
 import { DocumentListItem } from '../../core/models/it03.models';
 import { describeError } from '../../core/problem-details';
+import { Spinner } from '../../shared/spinner';
 
 interface StatusTile {
   code: string;
@@ -13,6 +14,7 @@ interface StatusTile {
 
 @Component({
   selector: 'app-summary-page',
+  imports: [Spinner],
   templateUrl: './summary-page.html',
   styleUrl: './summary-page.css',
 })

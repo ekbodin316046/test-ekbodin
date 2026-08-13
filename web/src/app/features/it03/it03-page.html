@@ -10,6 +10,10 @@
     <span class="card-title">รายการเอกสารรออนุมัติ</span>
   </header>
 
+  @if (isLoading() && documents().length > 0) {
+    <div class="loading-bar" role="status" aria-label="กำลังโหลดข้อมูล"></div>
+  }
+
   <div class="card-body">
     <div class="toolbar">
       <button
@@ -100,7 +104,11 @@
           } @empty {
             <tr>
               <td class="cell-empty muted" colspan="4">
-                {{ isLoading() ? 'กำลังโหลดข้อมูล...' : 'ไม่พบข้อมูล' }}
+                @if (isLoading()) {
+                  <app-spinner />
+                } @else {
+                  ไม่พบข้อมูล
+                }
               </td>
             </tr>
           }

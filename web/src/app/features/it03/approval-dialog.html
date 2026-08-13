@@ -34,7 +34,12 @@
         [disabled]="!canConfirm()"
         (click)="submit()"
       >
-        {{ saving() ? 'กำลังบันทึก...' : confirmLabel() }}
+        @if (saving()) {
+          <span class="spinner spinner-on-accent spinner-inline" aria-hidden="true"></span>
+          กำลังบันทึก...
+        } @else {
+          {{ confirmLabel() }}
+        }
       </button>
 
       <button type="button" class="btn btn-muted" [disabled]="saving()" (click)="cancelled.emit()">

@@ -14,7 +14,7 @@
     @if (errorMessage()) {
       <p class="alert alert-error" role="alert">{{ errorMessage() }}</p>
     } @else if (isLoading()) {
-      <p class="state muted">กำลังโหลดข้อมูล...</p>
+      <app-spinner />
     } @else {
       <div class="table-scroll">
         <table class="data-table">

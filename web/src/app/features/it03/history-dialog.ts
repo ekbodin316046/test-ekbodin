@@ -3,9 +3,11 @@ import { Component, OnInit, inject, input, output, signal } from '@angular/core'
 import { It03Service } from '../../core/it03.service';
 import { ApprovalLogEntry, DocumentListItem } from '../../core/models/it03.models';
 import { describeError } from '../../core/problem-details';
+import { Spinner } from '../../shared/spinner';
 
 @Component({
   selector: 'app-history-dialog',
+  imports: [Spinner],
   templateUrl: './history-dialog.html',
   styleUrl: './history-dialog.css',
 })
